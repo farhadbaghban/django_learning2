@@ -1,7 +1,7 @@
 {% extends 'base.html' %} {% block title %} Registeration {% endblock title %}
 {% block content %}
 <h3>Registeration Form</h3>
-<form method="Post">
+<form method="Post" class="col-md-6" novalidate>
   {% csrf_token %} {{form.as_p}}
   <input type="submit" value="Register" />
 </form>

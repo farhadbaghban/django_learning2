@@ -15,12 +15,17 @@
       .jumbotron {
         padding: 20px;
         margin-bottom: 20px;
-        background-color: #93e1ed;
+        background-color: #e9ecef;
       }
     </style>
   </head>
 
   <body>
-    <div class="jumbotron">{% block content %}{% endblock content %}</div>
+    {% include 'inc/navbar.html' %}
+    <div class="jumbotron">
+      {% include 'inc/messages.html' %} 
+      {% block content %}
+      {% endblock content%}
+    </div>
   </body>
 </html>
