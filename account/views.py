@@ -11,6 +11,11 @@ class UserRegistrationView(View):
     form_class = UserRegistrationForm
     template_class = "account/registeration.html"
 
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect("home:index")
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request):
         form = self.form_class()
         return render(request, self.template_class, {"form": form})
@@ -30,6 +35,11 @@ class UserRegistrationView(View):
 class UserLoginView(View):
     form_class = UserLoginForm
     template_class = "account/Login.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect("home:index")
+        return super().dispatch(request, *args, **kwargs)
 
     def get(self, request):
         form = self.form_class()
@@ -51,6 +61,12 @@ class UserLoginView(View):
 
 
 class UserLogoutView(View):
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return super().dispatch(request, *args, **kwargs)
+        messages.error(request, "You Are Not Logged In", "warning")
+        return redirect("home:index")
+
     def get(self, request):
         logout(request)
         messages.success(request, "You are Logged out SuccessFully", "success")
