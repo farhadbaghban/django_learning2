@@ -5,6 +5,7 @@ from django.views import View
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 class UserRegistrationView(View):
@@ -60,13 +61,7 @@ class UserLoginView(View):
         return render(request, self.template_class, {"form": form})
 
 
-class UserLogoutView(View):
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return super().dispatch(request, *args, **kwargs)
-        messages.error(request, "You Are Not Logged In", "warning")
-        return redirect("home:index")
-
+class UserLogoutView(LoginRequiredMixin, View):
     def get(self, request):
         logout(request)
         messages.success(request, "You are Logged out SuccessFully", "success")
