@@ -1,12 +1,11 @@
 {% extends 'base.html' %}
-
-{% block content %}
-
-{% for post in posts  %}
-<h3>{{post.user.username}}</h3>
-<p> {{post.body}}</p>
-
-{% endfor %}
-
-
+{% block content %}  
+    {% for post in posts  %}
+        {% if request.user.id == post.user.id %}
+            <a href="{% url 'home:Post_Delete' post.id %}" class='btn btn-danger'>Delete</a>
+            <a href="{% url 'home:Post_Update' post.id %}" class='btn btn-info'>Update</a>
+        {% endif %}
+        <h3>{{post.user.username}}</h3>
+        <p> {{post.body}}</p>
+    {% endfor %}
 {% endblock content %}
