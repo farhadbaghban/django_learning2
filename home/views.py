@@ -19,6 +19,6 @@ class UserPostsView(LoginRequiredMixin, View):
 
 
 class UserPostView(View):
-    def get(self, request, slug):
-        post = Post.objects.filter(slug=slug)
+    def get(self, request, post_id, post_slug):
+        post = Post.objects.filter(pk=post_id, slug=post_slug)
         return render(request, "home/userposts.html", {"posts": post})

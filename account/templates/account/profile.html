@@ -10,8 +10,7 @@
 
 <div class='card col-md-3' >
 {% for post in posts  %}
-<a href={% url 'home:User_Post' post.slug %} class='card-body'> {{post.slug}}</p>
-
+<a href='{{ post.get_absolute_url }}' class='card-body'> {{post.slug}}</a>
 {% endfor %}
 </div>
 {% endblock content %}

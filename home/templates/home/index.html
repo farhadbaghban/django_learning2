@@ -6,8 +6,7 @@
 <div class='card'>
     {% for post in posts %}
         <a href={% url 'home:User_Posts' post.user.id %} class='text-bg-dark col-md-3 text-center'>{{post.user.username}}</a>
-        <a href={% url 'home:User_Post' post.slug %} class='card-body'>{{post.slug}}</a>
-
+        <a href='{{ post.get_absolute_url }}' class='card-body'>{{post.slug}}</a>
     {% endfor %}
 
 </div>   
