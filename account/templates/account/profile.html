@@ -1,16 +1,18 @@
 {% extends 'base.html' %}
 
-{% block content %}
+    {% block content %}
 
-<h2 class = 'text-center' > {{user.username}} </h2>
+        <h2 class = 'text-center' > {{user.username}} </h2>
 
-</br>
+        </br>
 
-<h4 class= 'text-center'> {{user.email}} </h4>
-
-<div class='card col-md-3' >
-{% for post in posts  %}
-<a href='{{ post.get_absolute_url }}' class='card-body'> {{post.slug}}</a>
-{% endfor %}
-</div>
+        <h4 class= 'text-center'> {{user.email}} </h4>
+        {% if user.id == request.user.id %}
+            <a href={% url 'home:Post_Create' %} class="btn btn-success">Create</a>
+        {% endif %}
+        <div class='card col-md-3' >
+            {% for post in posts  %}
+                <a href='{{ post.get_absolute_url }}' class='card-body'> {{post.slug}}</a>
+            {% endfor %}
+        </div>
 {% endblock content %}

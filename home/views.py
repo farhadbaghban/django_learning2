@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from .models import Post
 from django.contrib import messages
-from .forms import PostUpdateForm
+from .forms import PostCreateUpdateForm
 from django.utils.text import slugify
 
 
@@ -39,7 +39,7 @@ class PostDeleteView(LoginRequiredMixin, View):
 
 
 class PostUpdateView(LoginRequiredMixin, View):
-    form_class = PostUpdateForm
+    form_class = PostCreateUpdateForm
     template_class = "home/update.html"
 
     def setup(self, request, *args, **kwargs):
@@ -53,12 +53,12 @@ class PostUpdateView(LoginRequiredMixin, View):
             return redirect("home:index")
         return super().dispatch(request, *args, **kwargs)
 
-    def get(self, request):
+    def get(self, request, post_id):
         post = self.post_instance
         form = self.form_class(instance=post)
         return render(request, self.template_class, {"form": form})
 
-    def post(self, request):
+    def post(self, request, post_id):
         post = self.post_instance
         form = self.form_class(request.POST, instance=post)
         if form.is_valid():
@@ -67,3 +67,23 @@ class PostUpdateView(LoginRequiredMixin, View):
             new_form.save()
             messages.success(request, "Post Updated SuccessFully", "success")
             return redirect("home:User_Post", post.id, post.slug)
+
+
+class PostCreateView(LoginRequiredMixin, View):
+    form_class = PostCreateUpdateForm
+    template_class = "home/create.html"
+
+    def get(self, request):
+        form = self.form_class
+        return render(request, self.template_class, {"form": form})
+
+    def post(self, request):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            new_form = form.save(commit=False)
+            new_form.slug = slugify(form.cleaned_data["body"][:30])
+            new_form.user = request.user
+            new_form.save()
+            messages.success(request, "Your Post Created SuccessFully", "success")
+            return redirect("home:User_Post", new_form.id, new_form.slug)
+            # return redirect("account:User_Profile", request.user.id)
