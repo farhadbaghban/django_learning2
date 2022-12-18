@@ -9,6 +9,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from home.models import Post
 from django.contrib.auth import views as auth_view
 from django.urls import reverse_lazy
+from .models import Relation
 
 
 class UserRegistrationView(View):
@@ -75,9 +76,17 @@ class UserProfileView(LoginRequiredMixin, View):
     template_class = "account/profile.html"
 
     def get(self, request, user_id):
+        exist_relation = False
         user = User.objects.get(pk=user_id)
         posts = Post.objects.filter(user=user)
-        return render(request, self.template_class, {"user": user, "posts": posts})
+        relation = Relation.objects.filter(from_user=request.user, to_user=user)
+        if relation.exists():
+            exist_relation = True
+        return render(
+            request,
+            self.template_class,
+            {"user": user, "posts": posts, "exist_relation": exist_relation},
+        )
 
 
 class UserPasswordResetView(auth_view.PasswordResetView):
@@ -97,3 +106,79 @@ class UserPasswordResetConfirmView(auth_view.PasswordResetConfirmView):
 
 class UserPasswordResetCompleteView(auth_view.PasswordResetCompleteView):
     template_name = "account/password_reset_complete.html"
+
+
+class UserFollowView(LoginRequiredMixin, View):
+    template_class = "account:User_Profile"
+
+    def setup(self, request, *args, **kwargs):
+        self.user_instance = User.objects.get(pk=kwargs["user_id"])
+        self.user_logined = User.objects.get(pk=request.user.id)
+        self.relation = Relation.objects.filter(
+            from_user=self.user_logined, to_user=self.user_instance
+        )
+        return super().setup(request, *args, **kwargs)
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.user_instance == self.user_logined:
+            messages.error(request, "You Can't Follow your self", "danger")
+            return redirect(
+                self.template_class,
+                self.user_instance.id,
+            )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, user_id):
+        if self.relation.exists():
+            messages.error(request, "You Can't follow againg this User", "danger")
+        else:
+            Relation.objects.create(
+                from_user=self.user_logined, to_user=self.user_instance
+            )
+            messages.success(
+                request,
+                f"You Are Followed {self.user_instance.username}   SuccessFully",
+                "success",
+            )
+        return redirect(
+            self.template_class,
+            self.user_instance.id,
+        )
+
+
+class UserUnfollowView(LoginRequiredMixin, View):
+    template_class = "account:User_Profile"
+
+    def setup(self, request, *args, **kwargs):
+        self.user_instance = User.objects.get(pk=kwargs["user_id"])
+        self.user_logined = User.objects.get(pk=request.user.id)
+        self.relation = Relation.objects.filter(
+            from_user=self.user_logined, to_user=self.user_instance
+        )
+        return super().setup(request, *args, **kwargs)
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.user_instance == self.user_logined:
+            messages.error(request, "You Can't UnFollow your self", "danger")
+            return redirect(
+                self.template_class,
+                self.user_instance.id,
+            )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, user_id):
+        if self.relation.exists():
+            self.relation.delete()
+            messages.success(
+                request, f"You Unfollowe {self.user_instance}  SuccessFully", "success"
+            )
+        else:
+            messages.error(
+                request,
+                f"You can't Unfollow {self.user_instance}.Becuse You Are Not Followed Him",
+                "danger",
+            )
+        return redirect(
+            self.template_class,
+            self.user_instance.id,
+        )

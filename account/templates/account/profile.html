@@ -10,6 +10,13 @@
         {% if user.id == request.user.id %}
             <a href={% url 'home:Post_Create' %} class="btn btn-success">Create</a>
         {% endif %}
+        {% if user.id != request.user.id  %}
+            {% if exist_relation %}
+                <a href={% url 'account:user_unfollow' user.id %} class="btn btn-danger">UnFollow</a>
+            {% else %}
+                <a href={% url 'account:user_follow' user.id %} class="btn btn-primary">Follow</a>    
+            {% endif %}
+        {% endif %}
         <div class='card col-md-3' >
             {% for post in posts  %}
                 <a href='{{ post.get_absolute_url }}' class='card-body'> {{post.slug}}</a>

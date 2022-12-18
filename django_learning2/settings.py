@@ -135,4 +135,5 @@ EMAIL_HOST = "smtp-relay.sendinblue.com"
 EMAIL_HOST_USER = "baghbanfarhad@gmail.com"
 EMAIL_PORT = 587
 EMAIL_HOST_PASSWORD = "WDAIr3v5yL4QUzfc"
+# EMAIL_HOST_PASSWORD = "xsmtpsib-8dc7255a4c1bce0a0dab216c69c15ae7106b4662dce58b4f714190ab051713b9-V3AD9mhE5M6qxPwO"
 EMAIL_USE_TLS = True
