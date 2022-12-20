@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from .models import Post
+from .models import Post, Comment
 from django.contrib import messages
 from .forms import PostCreateUpdateForm
 from django.utils.text import slugify
@@ -24,7 +24,10 @@ class UserPostsView(LoginRequiredMixin, View):
 class UserPostView(View):
     def get(self, request, post_id, post_slug):
         post = Post.objects.filter(pk=post_id, slug=post_slug)
-        return render(request, "home/userposts.html", {"posts": post})
+        comments = post.pcomments.filter(is_reply=False)
+        return render(
+            request, "home/userposts.html", {"posts": post}, {"comments": comments}
+        )
 
 
 class PostDeleteView(LoginRequiredMixin, View):
