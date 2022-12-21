@@ -4,8 +4,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from .models import Post, Comment
 from django.contrib import messages
-from .forms import PostCreateUpdateForm
+from .forms import PostCreateUpdateForm, CommentCreateForm, CommentReplyForm
 from django.utils.text import slugify
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 
 
 class HomeView(View):
@@ -22,12 +24,35 @@ class UserPostsView(LoginRequiredMixin, View):
 
 
 class UserPostView(View):
-    def get(self, request, post_id, post_slug):
-        post = Post.objects.filter(pk=post_id, slug=post_slug)
-        comments = post.pcomments.filter(is_reply=False)
-        return render(
-            request, "home/userposts.html", {"posts": post}, {"comments": comments}
+    form_class = CommentCreateForm
+
+    def setup(self, request, *args, **kwargs):
+        self.post_instance = Post.objects.get(
+            pk=kwargs["post_id"], slug=kwargs["post_slug"]
         )
+        return super().setup(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        form = self.form_class
+        comments = self.post_instance.pcomments.all()
+        return render(
+            request,
+            "home/userpost.html",
+            {"post": self.post_instance, "form": form, "comments": comments},
+        )
+
+    @method_decorator(login_required)
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            new_comment = form.save(commit=False)
+            new_comment.user = request.user
+            new_comment.post = self.post_instance
+            new_comment.save()
+            messages.success(request, "Your Comment added successFully. ", "success")
+            return redirect(
+                "home:User_Post", self.post_instance.id, self.post_instance.slug
+            )
 
 
 class PostDeleteView(LoginRequiredMixin, View):
@@ -90,3 +115,33 @@ class PostCreateView(LoginRequiredMixin, View):
             messages.success(request, "Your Post Created SuccessFully", "success")
             return redirect("home:User_Post", new_form.id, new_form.slug)
             # return redirect("account:User_Profile", request.user.id)
+
+
+class CommentReplyView(LoginRequiredMixin, View):
+    form_class = CommentReplyForm
+    template_class = "home/comment_reply.html"
+
+    def setup(self, request, *args, **kwargs):
+        self.comment_instance = Comment.objects.get(pk=kwargs["comment_id"])
+        return super().setup(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        form = self.form_class
+        replies = self.comment_instance.rcomments.all()
+        return render(
+            request,
+            self.template_class,
+            {"form": form, "comment": self.comment_instance, "replies": replies},
+        )
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            new_reply = form.save(commit=False)
+            new_reply.is_reply = True
+            new_reply.user = self.comment_instance.user
+            new_reply.post = self.comment_instance.post
+            new_reply.reply = self.comment_instance
+            new_reply.save()
+            messages.success(request, "Your Reply addded successFully", "success")
+            return redirect("home:Comment_Reply", self.comment_instance.id)

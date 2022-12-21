@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}  
-    {% for post in posts  %}
+    
         {% if request.user.id == post.user.id %}
             <a href="{% url 'home:Post_Delete' post.id %}" class='btn btn-danger'>Delete</a>
             <a href="{% url 'home:Post_Update' post.id %}" class='btn btn-info'>Update</a>
@@ -16,14 +16,17 @@
                 </form>    
             </div>   
         {% endif %}
-    {% endfor %}
+    
     <br/>
     </hr>
     {% for comment in comments %}
-        <div class='card bg-dark text-white col-md-4'>
-            <p class='card-header'>{{comment.user}}|{{comment.created|timesince}}</p>
-            <p class='card-body'>{{comment.body}}</p>
-        </div>
+        {% if comment.is_reply != True %}
+            <div class='card bg-dark text-white col-md-5'>
+                <p class='card-header'>{{comment.user}}|{{comment.created|timesince}}</p>
+                <a class='card-body' href={% url 'home:Comment_Reply' comment.id %}>{{comment.body}}</a>
+            </div>
+            <br/>
+        {% endif %}    
     {% empty %}
         <div class='card bg-dark text-white col-md-4'>
             <p class='card-body'>This Post haven't any comments</p>

@@ -13,5 +13,5 @@ class PostAdmin(admin.ModelAdmin):
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ("ucomments", "pcomments", "is_reply", "created")
-    raw_id_fields = ("ucomments", "pcomments", "rcomments")
+    list_display = ("user", "post", "is_reply", "created")
+    raw_id_fields = ("user", "post", "reply")

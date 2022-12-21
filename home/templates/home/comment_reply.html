@@ -1,0 +1,20 @@
+{% extends 'base.html' %} {% block content %}
+<div class="card bg-dark text-white col-md-5">
+  <p class="card-header">{{comment.user}}|{{comment.created|timesince}}</p>
+  <p class="card-body">{{comment.body}}</p>
+</div>
+<br />
+<div>
+  <form action="" method="post">
+    {% csrf_token %} {{form.as_p}}
+    <input type="submit" value="Reply" />
+  </form>
+</div>
+
+{% for reply in replies %}
+<div class="card bg-dark text-white col-md-5">
+  <p class="card-header">{{reply.user}}|{{reply.created|timesince}}</p>
+  <p class="card-body">{{reply.body}}</p>
+</div>
+<br />
+{% endfor %} {% endblock content %}
