@@ -5,6 +5,16 @@
 </div>
 <br />
 <div>
+  {% comment %}
+  <a
+    href="{% url 'home:comment_like' comment.id %}"
+    class="{% if like.is_comment == True%} disable {%endif%} col-md-2 btn btn-primary"
+    >Like</a
+  >
+  {% endcomment %}
+</div>
+<br />
+<div>
   <form action="" method="post">
     {% csrf_token %} {{form.as_p}}
     <input type="submit" value="Reply" />

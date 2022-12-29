@@ -2,7 +2,12 @@
 {% block title %} Index 
 {% endblock title %} 
 {% block content %}
-<h2>This is Index page</h2>
+<div>
+    <form method = "get" ,action=''>
+        {{form.as_p}}
+        <input type='submit' value = 'search'>
+    </form>    
+</div>
 <div class='card'>
     {% for post in posts %}
         <a href={% url 'account:User_Profile' post.user.id %} class='text-bg-dark col-md-3 text-center'>{{post.user.username}}</a>

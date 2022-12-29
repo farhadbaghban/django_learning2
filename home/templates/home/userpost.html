@@ -9,6 +9,13 @@
         <p> {{post.body}}</p>
         {% if request.user.is_authenticated %}
             <div>
+                {% if can_like %}
+                    <a href="{% url 'home:post_like' post.id %}" class="disabled col-md-2 btn btn-danger">Unlike  ( {{ post.liked_count}}  )</a>
+                {% else %}
+                    <a href="{% url 'home:post_like' post.id %}" class="col-md-2 btn btn-primary">Like  ( {{ post.liked_count}}  )</a>    
+                {% endif %}
+            </div>   
+            <div>
                 <form method= 'post' action="">
                     {% csrf_token %}
                     {{form.as_p}}

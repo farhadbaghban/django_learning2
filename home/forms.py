@@ -24,3 +24,7 @@ class CommentReplyForm(forms.ModelForm):
         widgets = {
             "body": forms.Textarea(attrs={"class": "col-md-4 text-white bg-dark"})
         }
+
+
+class PostSearchForm(forms.Form):
+    search = forms.CharField(widget=forms.TextInput(attrs={"class": "form-control"}))
