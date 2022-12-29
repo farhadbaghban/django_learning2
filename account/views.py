@@ -1,6 +1,6 @@
 from pyexpat.errors import messages
 from django.shortcuts import render, redirect
-from .forms import UserRegistrationForm, UserLoginForm
+from .forms import UserRegistrationForm, UserLoginForm, EditUserForm
 from django.views import View
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -9,7 +9,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from home.models import Post
 from django.contrib.auth import views as auth_view
 from django.urls import reverse_lazy
-from .models import Relation
+from .models import Relation, Profile
 
 
 class UserRegistrationView(View):
@@ -93,6 +93,26 @@ class UserProfileView(LoginRequiredMixin, View):
             self.template_class,
             {"user": user, "posts": posts, "exist_relation": exist_relation},
         )
+
+
+class EditUserView(LoginRequiredMixin, View):
+    template_class = "account/edit_profile.html"
+    form_class = EditUserForm
+
+    def get(self, request, *args, **kwargs):
+        form = self.form_class(
+            instance=request.user.profile, initial={"email": request.user.email}
+        )
+        return render(request, self.template_class, {"form": form})
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST, instance=request.user.profile)
+        if form.is_valid():
+            form.save()
+            request.user.email = form.cleaned_data["email"]
+            request.user.save()
+            messages.success(request, "Editet SuccessFully", "success")
+        return redirect("account:User_Profile", request.user.id)
 
 
 class UserPasswordResetView(auth_view.PasswordResetView):

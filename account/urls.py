@@ -31,4 +31,5 @@ urlpatterns = [
         views.UserUnfollowView.as_view(),
         name="user_unfollow",
     ),
+    path("edit_user/", views.EditUserView.as_view(), name="edit_user"),
 ]

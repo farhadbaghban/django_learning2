@@ -9,6 +9,7 @@
         <h4 class= 'text-center'> {{user.email}} </h4>
         {% if user.id == request.user.id %}
             <a href={% url 'home:Post_Create' %} class="btn btn-success">Create</a>
+            <a href={% url 'account:edit_user'%} class="btn btn-info">Edit Profile</a>
         {% endif %}
         {% if user.id != request.user.id  %}
             {% if exist_relation %}
